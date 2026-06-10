@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@mike_ragan — raganwolfe.com</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --apricot: #D4907A;
+      --jet:     #0A0A0A;
+      --grey:    #6B6B6B;
+      --light:   #B8B8B8;
+      --white:   #FFFFFF;
+    }
+
+    body {
+      background: var(--jet);
+      color: var(--light);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 2rem;
+      border-bottom: 1px solid #1a1a1a;
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+    }
+
+    header a {
+      color: var(--grey);
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      transition: color 0.15s;
+    }
+
+    header a:hover { color: var(--apricot); }
+
+    h1 {
+      color: var(--apricot);
+      font-size: 0.875rem;
+      font-weight: normal;
+      letter-spacing: 0.15em;
+    }
+
+    #meta {
+      padding: 1rem 2rem;
+      color: var(--grey);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    #feed {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .tweet {
+      padding: 1.25rem 0;
+      border-bottom: 1px solid #141414;
+    }
+
+    .tweet:last-child { border-bottom: none; }
+
+    .tweet-date {
+      color: var(--grey);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .tweet-text {
+      color: var(--light);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .tweet-text a {
+      color: var(--apricot);
+      text-decoration: none;
+    }
+
+    .tweet-text a:hover { text-decoration: underline; }
+
+    #back {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--apricot);
+      color: var(--apricot);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    #back:hover {
+      background: var(--apricot);
+      color: var(--jet);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>@mike_ragan</h1>
+    <a href="/">← raganwolfe.com</a>
+  </header>
+
+  <div id="meta">archived tweets — no longer active</div>
+
+  <div id="feed">
+    <!-- tweets injected here -->
+  </div>
+
+  <a id="back" href="/">Home</a>
+
+</body>
+</html>
