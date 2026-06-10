@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>raganwolfe.com</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0A0A0A;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #email-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 10;
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 1px solid #D4907A;
+      color: #D4907A;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    #email-btn:hover {
+      background: #D4907A;
+      color: #0A0A0A;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <a id="email-btn" href="mailto:mjraganwolfe@gmail.com">Email Me</a>
+
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    // Claude palette
+    const APRICOT    = '#D4907A';
+    const APRICOT_MID = '#9E5E45';
+    const GREY       = '#6B6B6B';
+    const WHITE      = '#FFFFFF';
+    const BG         = 'rgba(10, 10, 10, 0.05)';
+
+    const FONT_SIZE = 14;
+    const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&';
+
+    let cols, drops;
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      cols  = Math.floor(canvas.width / FONT_SIZE);
+      drops = Array.from({ length: cols }, () => Math.random() * -canvas.height / FONT_SIZE | 0);
+    }
+
+    function draw() {
+      // Fade trail
+      ctx.fillStyle = BG;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = `${FONT_SIZE}px 'Courier New', monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const y = drops[i];
+
+        // Head character — white
+        ctx.fillStyle = WHITE;
+        ctx.fillText(
+          CHARS[Math.random() * CHARS.length | 0],
+          i * FONT_SIZE,
+          y * FONT_SIZE
+        );
+
+        // One step behind head — full apricot
+        if (y > 1) {
+          ctx.fillStyle = APRICOT;
+          ctx.fillText(
+            CHARS[Math.random() * CHARS.length | 0],
+            i * FONT_SIZE,
+            (y - 1) * FONT_SIZE
+          );
+        }
+
+        // Two steps behind — mid apricot
+        if (y > 2) {
+          ctx.fillStyle = APRICOT_MID;
+          ctx.fillText(
+            CHARS[Math.random() * CHARS.length | 0],
+            i * FONT_SIZE,
+            (y - 2) * FONT_SIZE
+          );
+        }
+
+        // Rest of trail handled by the fade rect above; scatter a grey flicker occasionally
+        if (Math.random() > 0.97) {
+          ctx.fillStyle = GREY;
+          const ghostY = Math.random() * (y - 3) | 0;
+          if (ghostY > 0) {
+            ctx.fillText(
+              CHARS[Math.random() * CHARS.length | 0],
+              i * FONT_SIZE,
+              ghostY * FONT_SIZE
+            );
+          }
+        }
+
+        // Reset column when it goes off screen (with some randomness)
+        if (drops[i] * FONT_SIZE > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    setInterval(draw, 40);
+  </script>
+</body>
+</html>
