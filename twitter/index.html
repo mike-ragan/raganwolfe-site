@@ -129,6 +129,36 @@
 
     .tweet-meta span { color: var(--grey); }
 
+    .tweet-media {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tweet-media img {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      background: #111;
+      display: block;
+    }
+
+    .tweet-media img:only-child {
+      max-width: 100%;
+    }
+
+    .tweet-media img:not(:only-child) {
+      max-width: calc(50% - 0.25rem);
+    }
+
+    .tweet-media video {
+      max-width: 100%;
+      max-height: 400px;
+      background: #111;
+      display: block;
+    }
+
     #load-more {
       display: block;
       margin: 2rem auto;
@@ -249,6 +279,18 @@
         .replace(/"/g, '&quot;');
     }
 
+    function renderMedia(files) {
+      if (!files || files.length === 0) return '';
+      const items = files.map(function(name) {
+        const path = 'media/' + name;
+        if (name.endsWith('.mp4')) {
+          return '<video controls preload="none"><source src="' + path + '" type="video/mp4"></video>';
+        }
+        return '<img src="' + path + '" loading="lazy" alt="">';
+      });
+      return '<div class="tweet-media">' + items.join('') + '</div>';
+    }
+
     function renderTweet(t) {
       const metaParts = [];
       if (t.likes > 0) metaParts.push('<span>' + t.likes + ' ♥</span>');
@@ -257,6 +299,7 @@
       return '<div class="tweet">' +
         '<div class="tweet-date">' + formatDate(t.date) + '</div>' +
         '<div class="tweet-text">' + linkify(escapeHtml(t.text)) + '</div>' +
+        renderMedia(t.media) +
         (metaParts.length ? '<div class="tweet-meta">' + metaParts.join('') + '</div>' : '') +
         '</div>';
     }
