@@ -24,6 +24,29 @@
       height: 100%;
     }
 
+    #twitter-btn {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      z-index: 10;
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 1px solid #6B6B6B;
+      color: #6B6B6B;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    #twitter-btn:hover {
+      background: #6B6B6B;
+      color: #0A0A0A;
+    }
+
     #email-btn {
       position: fixed;
       bottom: 2rem;
@@ -50,6 +73,7 @@
 </head>
 <body>
   <canvas id="matrix"></canvas>
+  <a id="twitter-btn" href="/twitter/">@mike_ragan</a>
   <a id="email-btn" href="mailto:mike@raganwolfe.com">Email Me</a>
 
   <script>

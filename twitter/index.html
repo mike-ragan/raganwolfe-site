@@ -13,6 +13,7 @@
       --grey:    #6B6B6B;
       --light:   #B8B8B8;
       --white:   #FFFFFF;
+      --border:  #1a1a1a;
     }
 
     body {
@@ -26,7 +27,7 @@
 
     header {
       padding: 2rem;
-      border-bottom: 1px solid #1a1a1a;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: baseline;
       gap: 1.5rem;
@@ -49,18 +50,46 @@
       letter-spacing: 0.15em;
     }
 
-    #meta {
+    #stats {
       padding: 1rem 2rem;
-      color: var(--grey);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 1.5rem;
       font-size: 0.75rem;
+      color: var(--grey);
       letter-spacing: 0.05em;
-      border-bottom: 1px solid #1a1a1a;
     }
+
+    #stats span { white-space: nowrap; }
+    #stats strong { color: var(--light); }
+
+    #controls {
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #search {
+      background: transparent;
+      border: 1px solid #2a2a2a;
+      color: var(--light);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.8rem;
+      padding: 0.5rem 0.75rem;
+      width: 100%;
+      max-width: 400px;
+      letter-spacing: 0.05em;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    #search::placeholder { color: #3a3a3a; }
+    #search:focus { border-color: var(--grey); }
 
     #feed {
       max-width: 640px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 0 2rem 6rem;
     }
 
     .tweet {
@@ -90,6 +119,50 @@
 
     .tweet-text a:hover { text-decoration: underline; }
 
+    .tweet-meta {
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      color: #3a3a3a;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .tweet-meta span { color: var(--grey); }
+
+    #load-more {
+      display: block;
+      margin: 2rem auto;
+      padding: 0.75rem 2rem;
+      background: transparent;
+      border: 1px solid #2a2a2a;
+      color: var(--grey);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    #load-more:hover {
+      border-color: var(--apricot);
+      color: var(--apricot);
+    }
+
+    #load-more:disabled {
+      opacity: 0.3;
+      cursor: default;
+      border-color: #2a2a2a;
+      color: var(--grey);
+    }
+
+    #result-count {
+      padding: 0.75rem 2rem;
+      font-size: 0.7rem;
+      color: #3a3a3a;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
     #back {
       position: fixed;
       bottom: 2rem;
@@ -110,6 +183,8 @@
       background: var(--apricot);
       color: var(--jet);
     }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
@@ -119,13 +194,147 @@
     <a href="/">← raganwolfe.com</a>
   </header>
 
-  <div id="meta">archived tweets — no longer active</div>
-
-  <div id="feed">
-    <!-- tweets injected here -->
+  <div id="stats">
+    <span>joined <strong>Oct 2010</strong></span>
+    <span><strong>2,539</strong> followers</span>
+    <span><strong>890</strong> following</span>
+    <span><strong>3,023</strong> original tweets</span>
+    <span><strong>6,753</strong> likes</span>
+    <span>archived — no longer active</span>
   </div>
 
+  <div id="controls">
+    <input id="search" type="search" placeholder="search tweets..." autocomplete="off" />
+  </div>
+
+  <div id="result-count"></div>
+
+  <div id="feed"></div>
+
   <a id="back" href="/">Home</a>
+
+  <script src="tweets-data.js"></script>
+  <script>
+    const PAGE = 50;
+    let filtered = [];
+    let shown = 0;
+
+    const feed = document.getElementById('feed');
+    const countEl = document.getElementById('result-count');
+    const searchEl = document.getElementById('search');
+
+    function formatDate(str) {
+      try {
+        const d = new Date(str);
+        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch { return str; }
+    }
+
+    function linkify(text) {
+      // linkify URLs
+      text = text.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+        const display = url.length > 55 ? url.slice(0, 52) + '…' : url;
+        return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + display + '</a>';
+      });
+      // linkify @mentions
+      text = text.replace(/@(\w+)/g, '<a href="https://twitter.com/$1" target="_blank" rel="noopener noreferrer">@$1</a>');
+      return text;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderTweet(t) {
+      const metaParts = [];
+      if (t.likes > 0) metaParts.push('<span>' + t.likes + ' ♥</span>');
+      if (t.rts > 0) metaParts.push('<span>' + t.rts + ' ↺</span>');
+
+      return '<div class="tweet">' +
+        '<div class="tweet-date">' + formatDate(t.date) + '</div>' +
+        '<div class="tweet-text">' + linkify(escapeHtml(t.text)) + '</div>' +
+        (metaParts.length ? '<div class="tweet-meta">' + metaParts.join('') + '</div>' : '') +
+        '</div>';
+    }
+
+    let loadMoreBtn = null;
+
+    function renderPage() {
+      const chunk = filtered.slice(shown, shown + PAGE);
+      if (chunk.length === 0) return;
+
+      const frag = document.createDocumentFragment();
+      chunk.forEach(function(t) {
+        const div = document.createElement('div');
+        div.innerHTML = renderTweet(t);
+        frag.appendChild(div.firstChild);
+      });
+
+      if (loadMoreBtn) {
+        feed.insertBefore(frag, loadMoreBtn);
+      } else {
+        feed.appendChild(frag);
+        loadMoreBtn = document.createElement('button');
+        loadMoreBtn.id = 'load-more';
+        loadMoreBtn.textContent = 'load more';
+        loadMoreBtn.addEventListener('click', function() {
+          shown += PAGE;
+          renderPage();
+          updateLoadMore();
+        });
+        feed.appendChild(loadMoreBtn);
+      }
+
+      shown += PAGE;
+      updateLoadMore();
+    }
+
+    function updateLoadMore() {
+      if (!loadMoreBtn) return;
+      if (shown >= filtered.length) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = 'end of archive';
+      } else {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = 'load more (' + (filtered.length - shown) + ' remaining)';
+      }
+    }
+
+    function applyFilter(query) {
+      feed.innerHTML = '';
+      loadMoreBtn = null;
+      shown = 0;
+
+      const q = query.trim().toLowerCase();
+      if (q) {
+        filtered = window.TWEETS.filter(function(t) {
+          return t.text.toLowerCase().includes(q);
+        });
+      } else {
+        filtered = window.TWEETS;
+      }
+
+      countEl.textContent = q
+        ? filtered.length + ' of ' + window.TWEETS.length + ' tweets match'
+        : '';
+
+      renderPage();
+    }
+
+    let debounce;
+    searchEl.addEventListener('input', function() {
+      clearTimeout(debounce);
+      debounce = setTimeout(function() {
+        applyFilter(searchEl.value);
+      }, 200);
+    });
+
+    applyFilter('');
+  </script>
 
 </body>
 </html>
