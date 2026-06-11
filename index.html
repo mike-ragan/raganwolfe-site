@@ -24,34 +24,19 @@
       height: 100%;
     }
 
-    #twitter-btn {
-      position: fixed;
-      bottom: 2rem;
-      left: 2rem;
-      z-index: 10;
-      padding: 0.75rem 1.5rem;
-      background: #6B6B6B;
-      border: 1px solid #6B6B6B;
-      color: #0A0A0A;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-
-    #twitter-btn:hover {
-      background: transparent;
-      color: #6B6B6B;
-    }
-
-    #email-btn {
+    #btn-group {
       position: fixed;
       bottom: 2rem;
       right: 2rem;
       z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: stretch;
+    }
+
+    #twitter-btn,
+    #email-btn {
       padding: 0.75rem 1.5rem;
       background: #D4907A;
       border: 1px solid #D4907A;
@@ -61,20 +46,39 @@
       letter-spacing: 0.15em;
       text-transform: uppercase;
       text-decoration: none;
-      cursor: pointer;
+      text-align: center;
       transition: background 0.2s, color 0.2s;
     }
 
+    #twitter-btn:hover,
     #email-btn:hover {
       background: transparent;
       color: #D4907A;
+    }
+
+    @media (max-width: 480px) {
+      #btn-group {
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        gap: 0;
+      }
+
+      #twitter-btn,
+      #email-btn {
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+      }
     }
   </style>
 </head>
 <body>
   <canvas id="matrix"></canvas>
-  <a id="twitter-btn" href="/twitter/">@mike_ragan</a>
-  <a id="email-btn" href="mailto:mike@raganwolfe.com">Email Me</a>
+  <div id="btn-group">
+    <a id="twitter-btn" href="/twitter/">@mike_ragan</a>
+    <a id="email-btn" href="mailto:mike@raganwolfe.com">Email Me</a>
+  </div>
 
   <script>
     const canvas = document.getElementById('matrix');
