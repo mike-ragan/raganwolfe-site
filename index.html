@@ -35,8 +35,7 @@
       align-items: stretch;
     }
 
-    #twitter-btn,
-    #email-btn {
+    .btn {
       padding: 0.75rem 1.5rem;
       background: #D4907A;
       border: 1px solid #D4907A;
@@ -50,8 +49,7 @@
       transition: background 0.2s, color 0.2s;
     }
 
-    #twitter-btn:hover,
-    #email-btn:hover {
+    .btn:hover {
       background: transparent;
       color: #D4907A;
     }
@@ -64,8 +62,7 @@
         gap: 0;
       }
 
-      #twitter-btn,
-      #email-btn {
+      .btn {
         border-left: none;
         border-right: none;
         border-bottom: none;
@@ -76,8 +73,11 @@
 <body>
   <canvas id="matrix"></canvas>
   <div id="btn-group">
-    <a id="twitter-btn" href="/twitter/">@mike_ragan</a>
-    <a id="email-btn" href="mailto:mike@raganwolfe.com">Email Me</a>
+    <a class="btn" href="/twitter/">@mike_ragan</a>
+    <a class="btn" href="https://letterboxd.com/MinnesotaSlims/" target="_blank" rel="noopener">Letterboxd</a>
+    <a class="btn" href="/portfolio/">Portfolio</a>
+    <a class="btn" href="/thespecial/">The Special</a>
+    <a class="btn" href="mailto:mike@raganwolfe.com">Email Me</a>
   </div>
 
   <script>
